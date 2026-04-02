@@ -59,6 +59,24 @@ def show_all_items():
 
     conn.close()
 
+def find_by_art(art):
+    conn = sqlite3.connect('accessories.db')
+    cursor = conn.cursor()
+
+    #Осуществляем поиск по введенному артикулу
+    cursor.execute("SELECT art, title, car_model, price FROM stock WHERE art = '{}'".format(art, ))
+    rows = cursor.fetchall()
+
+    if not rows:
+        print("\n--- Артикул не найден ---")
+    else:
+        print("\n--- СПИСОК НАЙДЕННЫХ ТОВАРОВ ---")
+        for row in rows:
+            item = Accessory(row[0], row[1], row[2], row[3])
+            print(item)
+
+    conn.close()
+
 # --- ЧАСТЬ 3: ГЛАВНЫЙ ЦИКЛ ---
 if __name__ == "__main__":
     init_db()
@@ -68,7 +86,8 @@ if __name__ == "__main__":
         print("\nМеню:")
         print("1. Добавить новый товар")
         print("2. Показать все товары")
-        print("3. Выход (exit)")
+        print("3. Поиск по артикулу")
+        print("4. Выход (exit)")
 
         choice = input("Выберите действие: ")
 
@@ -89,7 +108,11 @@ if __name__ == "__main__":
         elif choice == '2':
             show_all_items()
 
-        elif choice == '3' or choice.lower() == 'exit':
+        elif choice == '3':
+            search_art = input('Введите артикул: ')
+            find_by_art(search_art)
+
+        elif choice == '4' or choice.lower() == 'exit':
             print("До встречи!")
             break
         else:
