@@ -31,51 +31,48 @@ def init_db():
     conn.close()
 
 def add_to_db(item):
-    conn = sqlite3.connect('accessories.db')
-    cursor = conn.cursor()
-    # Используем SQL-запрос для вставки данных
-    cursor.execute('INSERT INTO stock (art, title, car_model, price) VALUES (?, ?, ?, ?)',
-                   (item.art, item.title, item.car_model, item.price))
-    conn.commit()
-    conn.close()
+    with sqlite3.connect('accessories.db') as conn:
+        cursor = conn.cursor()
+        # Используем SQL-запрос для вставки данных
+        cursor.execute('INSERT INTO stock (art, title, car_model, price) VALUES (?, ?, ?, ?)',
+                    (item.art, item.title, item.car_model, item.price))
+        conn.commit()
     print(f"--- [Успех]: {item.title} ({item.art}) добавлен в базу! ---")
 
 def show_all_items():
-    conn = sqlite3.connect('accessories.db')
-    cursor = conn.cursor()
+    with sqlite3.connect('accessories.db') as conn:
+        cursor = conn.cursor()
 
-    # Выбираем все данные из таблицы
-    cursor.execute('SELECT art, title, car_model, price FROM stock')
-    rows = cursor.fetchall() # fetchall() возвращает список кортежей
+        # Выбираем все данные из таблицы
+        cursor.execute('SELECT art, title, car_model, price FROM stock')
+        rows = cursor.fetchall() # fetchall() возвращает список кортежей
 
     if not rows:
         print("\n--- База данных пока пуста ---")
     else:
         print("\n--- СПИСОК ВСЕХ ТОВАРОВ ---")
-        for row in rows:
-            # Превращаем данные из БД обратно в объект нашего класса (ООП в действии!)
-            item = Accessory(row[0], row[1], row[2], row[3])
-            print(item)
-
-    conn.close()
+    for row in rows:
+    # Превращаем данные из БД обратно в объект нашего класса (ООП в действии!)
+        item = Accessory(row[0], row[1], row[2], row[3])
+        print(item)
 
 def find_by_art(art):
-    conn = sqlite3.connect('accessories.db')
-    cursor = conn.cursor()
-
-    #Осуществляем поиск по введенному артикулу
-    cursor.execute("SELECT art, title, car_model, price FROM stock WHERE art = '{}'".format(art, ))
-    rows = cursor.fetchall()
+    with sqlite3.connect('accessories.db') as conn:
+        cursor = conn.cursor()
+        #Никаких .format() или f-строк внутри SQL! А то можно дропнуть бд
+        #Осуществляем поиск по введенному артикулу
+        query = "SELECT art, title, car_model, price FROM stock WHERE art = ?"
+        cursor.execute(query, (art,))
+        rows = cursor.fetchall()
 
     if not rows:
         print("\n--- Артикул не найден ---")
     else:
-        print("\n--- СПИСОК НАЙДЕННЫХ ТОВАРОВ ---")
-        for row in rows:
-            item = Accessory(row[0], row[1], row[2], row[3])
-            print(item)
-
-    conn.close()
+        '''print("\n--- СПИСОК НАЙДЕННЫХ ТОВАРОВ ---")
+    for row in rows:
+        item = Accessory(row[0], row[1], row[2], row[3])
+        print(item)'''
+        print(f'Найдено: {rows}')
 
 # --- ЧАСТЬ 3: ГЛАВНЫЙ ЦИКЛ ---
 if __name__ == "__main__":
