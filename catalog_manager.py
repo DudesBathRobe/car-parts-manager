@@ -45,7 +45,7 @@ def show_all_items():
 
         # Выбираем все данные из таблицы
         cursor.execute('SELECT art, title, car_model, price FROM stock')
-        rows = cursor.fetchall() # fetchall() возвращает список кортежей
+        rows = cursor.fetchall()                # fetchall() возвращает список кортежей
 
     if not rows:
         print("\n--- База данных пока пуста ---")
@@ -63,16 +63,28 @@ def find_by_art(art):
         #Осуществляем поиск по введенному артикулу
         query = "SELECT art, title, car_model, price FROM stock WHERE art = ?"
         cursor.execute(query, (art,))
-        rows = cursor.fetchall()
+        rows = cursor.fetchone()
 
     if not rows:
         print("\n--- Артикул не найден ---")
     else:
-        '''print("\n--- СПИСОК НАЙДЕННЫХ ТОВАРОВ ---")
-    for row in rows:
-        item = Accessory(row[0], row[1], row[2], row[3])
-        print(item)'''
         print(f'Найдено: {rows}')
+
+def update_price(art, new_price):
+    with sqlite3.connect('accessories.db') as conn:
+        cursor = conn.cursor()
+
+        #Выполняем обновление
+        cursor.execute("UPDATE stock SET price = ? WHERE art = ?", (new_price, art))
+
+        # Проверяем, была ли обновлена хоть одна строка
+        if cursor.rowcount > 0:
+            print(f"--- [Успех]: Цена для артикула {art} обновлена до {new_price} ---")
+        else:
+            print(f"--- [Ошибка]: Товар с артикулом {art} не найден ---")
+
+        conn.commit()
+
 
 # --- ЧАСТЬ 3: ГЛАВНЫЙ ЦИКЛ ---
 if __name__ == "__main__":
@@ -84,7 +96,8 @@ if __name__ == "__main__":
         print("1. Добавить новый товар")
         print("2. Показать все товары")
         print("3. Поиск по артикулу")
-        print("4. Выход (exit)")
+        print("4. Измененить цену")
+        print("0. Выход (exit)")
 
         choice = input("Выберите действие: ")
 
@@ -109,7 +122,15 @@ if __name__ == "__main__":
             search_art = input('Введите артикул: ')
             find_by_art(search_art)
 
-        elif choice == '4' or choice.lower() == 'exit':
+        elif choice == '4':
+            art = input('Введите артикул: ')
+            try:
+                new_price = float(input("Введите новую цену: "))
+                update_price(art, new_price)
+            except ValueError:
+                print("Ошибка: Цена должна быть числом!")
+
+        elif choice == '0' or choice.lower() == 'exit':
             print("До встречи!")
             break
         else:
