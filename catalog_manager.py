@@ -74,7 +74,7 @@ def update_price(art, new_price):
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
 
-        #Выполняем обновление
+        # Выполняем обновление
         cursor.execute("UPDATE stock SET price = ? WHERE art = ?", (new_price, art))
 
         # Проверяем, была ли обновлена хоть одна строка
@@ -85,6 +85,20 @@ def update_price(art, new_price):
 
         conn.commit()
 
+def delete_item(art):
+    with sqlite3.connect('accessories.db') as conn:
+        cursor = conn.cursor()
+
+        # Выполняем удаление
+        cursor.execute("DELETE FROM stock where art = ?", (art,))
+
+        # Проверяем, была ли обновлена хоть одна строка
+        if cursor.rowcount > 0:
+            print(f"--- [Успех]: Товар с артикулом {art} был удален ---")
+        else:
+            print(f"--- [Ошибка]: Товар с артикулом {art} не найден ---")
+
+        conn.commit()
 
 # --- ЧАСТЬ 3: ГЛАВНЫЙ ЦИКЛ ---
 if __name__ == "__main__":
@@ -97,6 +111,7 @@ if __name__ == "__main__":
         print("2. Показать все товары")
         print("3. Поиск по артикулу")
         print("4. Измененить цену")
+        print("5. Удалить товар по артикулу")
         print("0. Выход (exit)")
 
         choice = input("Выберите действие: ")
@@ -129,6 +144,16 @@ if __name__ == "__main__":
                 update_price(art, new_price)
             except ValueError:
                 print("Ошибка: Цена должна быть числом!")
+
+        elif choice == '5':
+            art = input("Введите артикул: ")
+            print("")
+            print(f"Вы дейсьвительно хотите удалить артикул {art} из списка товаров? y/n")
+            temp_choice = input()
+            if temp_choice.lower() == 'y':
+                delete_item(art)
+            else:
+                break
 
         elif choice == '0' or choice.lower() == 'exit':
             print("До встречи!")
