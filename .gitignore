@@ -11,4 +11,6 @@ venv/
 *.txt                   #Игнорировать все файлы этого расширения
 !requirements.txt       #Но оставить этот
 *.db
-
+main.py
+correct
+.DS_store
