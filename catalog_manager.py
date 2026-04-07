@@ -112,9 +112,9 @@ def delete_item(art):
 
 def export_to_csv():
     with sqlite3.connect('accessories.db') as conn:
-        cursor = conn.cursor
+        cursor = conn.cursor()
         #Достаем все данные из таблицы
-        cursor.execute("SELECT art, title, car_model, prise from stock")
+        cursor.execute("SELECT art, title, car_model, price FROM stock")
         rows = cursor.fetchall()
 
         if not rows:
@@ -123,7 +123,7 @@ def export_to_csv():
 
         # Создаем (или перезаписываем) файл.
         # newline='' нужен, чтобы в Windows не было лишних пустых строк
-        with open('inventory_report.csv', 'w', newline='', encoding='utf-8') as file:
+        with open('inventory_report.csv', 'w', newline='', encoding='utf-8-sig') as file:
             writer = csv.writer(file, delimiter=';')    # Используем ';' для корректного открытия в русском Excel
 
             # Шапка
@@ -146,6 +146,7 @@ if __name__ == "__main__":
         print("3. Поиск по артикулу")
         print("4. Измененить цену")
         print("5. Удалить товар по артикулу")
+        print("6. Экспортировать данные в Excel (CSV)")
         print("0. Выход (exit)")
 
         choice = input("Выберите действие: ")
