@@ -1,0 +1,13 @@
+.idea/
+__pycache__/
+*.pyc
+venv/
+*.xlsx
+*.xls
+*.xlsm
+*.zip
+*.csv
+*.json
+*.txt                   #Игнорировать все файлы этого расширения
+!requirements.txt       #Но оставить этот
+*.bd

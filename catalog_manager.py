@@ -1,4 +1,5 @@
 import sqlite3
+from tabulate import tabulate
 
 # --- ЧАСТЬ 1: ООП ---
 class Accessory:
@@ -37,13 +38,12 @@ def add_to_db(item):
         cursor.execute('INSERT INTO stock (art, title, car_model, price) VALUES (?, ?, ?, ?)',
                     (item.art, item.title, item.car_model, item.price))
         conn.commit()
+    conn.close()
     print(f"--- [Успех]: {item.title} ({item.art}) добавлен в базу! ---")
 
 def show_all_items():
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
-
-        # Выбираем все данные из таблицы
         cursor.execute('SELECT art, title, car_model, price FROM stock')
         rows = cursor.fetchall()                # fetchall() возвращает список кортежей
 
@@ -51,10 +51,13 @@ def show_all_items():
         print("\n--- База данных пока пуста ---")
     else:
         print("\n--- СПИСОК ВСЕХ ТОВАРОВ ---")
-    for row in rows:
-    # Превращаем данные из БД обратно в объект нашего класса (ООП в действии!)
-        item = Accessory(row[0], row[1], row[2], row[3])
-        print(item)
+        headers = ["Артикул", "Название", "Модель авто", "Цена (руб.)"]
+
+        # Вся магия в одной строке!
+        # tablefmt="grid" делает красивые рамки, как в настоящих БД
+        print("\n" + tabulate(rows, headers=headers, tablefmt="pipe"))
+
+    conn.close()
 
 def find_by_art(art):
     with sqlite3.connect('accessories.db') as conn:
@@ -69,6 +72,8 @@ def find_by_art(art):
         print("\n--- Артикул не найден ---")
     else:
         print(f'Найдено: {rows}')
+
+    conn.close()
 
 def update_price(art, new_price):
     with sqlite3.connect('accessories.db') as conn:
@@ -85,6 +90,8 @@ def update_price(art, new_price):
 
         conn.commit()
 
+    conn.close()
+
 def delete_item(art):
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
@@ -99,6 +106,8 @@ def delete_item(art):
             print(f"--- [Ошибка]: Товар с артикулом {art} не найден ---")
 
         conn.commit()
+
+    conn.close()
 
 # --- ЧАСТЬ 3: ГЛАВНЫЙ ЦИКЛ ---
 if __name__ == "__main__":
@@ -152,8 +161,6 @@ if __name__ == "__main__":
             temp_choice = input()
             if temp_choice.lower() == 'y':
                 delete_item(art)
-            else:
-                break
 
         elif choice == '0' or choice.lower() == 'exit':
             print("До встречи!")
