@@ -1,4 +1,5 @@
 import sqlite3
+import csv
 from tabulate import tabulate
 
 # --- ЧАСТЬ 1: ООП ---
@@ -109,6 +110,30 @@ def delete_item(art):
 
     conn.close()
 
+def export_to_csv():
+    with sqlite3.connect('accessories.db') as conn:
+        cursor = conn.cursor
+        #Достаем все данные из таблицы
+        cursor.execute("SELECT art, title, car_model, prise from stock")
+        rows = cursor.fetchall()
+
+        if not rows:
+            print('\n--- [Ошибка]: База пуста, нечего экспортировать ---')
+            return
+
+        # Создаем (или перезаписываем) файл.
+        # newline='' нужен, чтобы в Windows не было лишних пустых строк
+        with open('inventory_report.csv', 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file, delimiter=';')    # Используем ';' для корректного открытия в русском Excel
+
+            # Шапка
+            writer.writerow(['Артикул', 'Название', "Модель авто", "Цена (руб.)"])
+
+            # Записываем строки из БД
+            writer.writerows(rows)
+
+    print("\n--- [Успех]: Отчет 'inventory_report.csv' успешно создан! ---")
+
 # --- ЧАСТЬ 3: ГЛАВНЫЙ ЦИКЛ ---
 if __name__ == "__main__":
     init_db()
@@ -161,6 +186,9 @@ if __name__ == "__main__":
             temp_choice = input()
             if temp_choice.lower() == 'y':
                 delete_item(art)
+
+        elif choice == '6':
+            export_to_csv()
 
         elif choice == '0' or choice.lower() == 'exit':
             print("До встречи!")
