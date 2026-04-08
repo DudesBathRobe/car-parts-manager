@@ -95,7 +95,7 @@ def show_all_items():
 
         # Вся магия в одной строке!
         # tablefmt="grid" делает красивые рамки, как в настоящих БД
-        print("\n" + tabulate(rows, headers=headers, tablefmt="pipe"))
+        print("\n" + tabulate(rows, headers=headers, tablefmt="fancy_grid"))
 
     conn.close()
 
