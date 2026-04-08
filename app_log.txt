@@ -1,0 +1,14 @@
+[2026-04-08 12:00:49] Выполнено: show_all_items. Аргументы:()
+[2026-04-08 12:01:07] Выполнено: find_by_art. Аргументы:('N-208712',)
+[2026-04-08 12:39:03] Выполнено: export_to_csv. Аргументы:()
+[2026-04-08 12:39:58] Выполнено: export_to_csv. Аргументы:()
+[2026-04-08 12:50:04] Ошибка в export_to_csv: Искусственная ошибка доступа для теста декоратора!.
+Подробности:
+Traceback (most recent call last):
+  File "/Users/mikevasovsky/PycharmProjects/pythonProject1/catalog_manager.py", line 27, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/mikevasovsky/PycharmProjects/pythonProject1/catalog_manager.py", line 157, in export_to_csv
+    raise PermissionError("Искусственная ошибка доступа для теста декоратора!")
+PermissionError: Искусственная ошибка доступа для теста декоратора!
+
+------------------------------

@@ -1,5 +1,8 @@
 import sqlite3
 import csv
+import functools
+import traceback
+from datetime import datetime
 from tabulate import tabulate
 
 # --- ЧАСТЬ 1: ООП ---
@@ -14,6 +17,40 @@ class Accessory:
         return f"Товар: {self.title} ({self.art}) для {self.car_model} ({self.price} руб.)"
 
 # --- ЧАСТЬ 2: РАБОТА С БД (SQL) ---
+def action_logger(func):
+    @functools.wraps(func)  #Сохраняем имя и описание функции
+    def wrapper(*args, **kwargs):
+        # Сообщение для лога
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        action_name = func.__name__
+        try:
+            result = func(*args, **kwargs)
+
+            #Записываем сообщение в лог
+            with open("app_log.txt", "a", encoding="utf-8") as log_file:
+                log_file.write(f"[{timestamp}] Выполнено: {action_name}. Аргументы:{args}\n")
+
+            return result
+
+        except Exception as ex:
+
+            #Перехватываем ошибку
+            error_mess = str(ex)
+            full_error = traceback.format_exc() #Весь путь ошибки
+
+            #Записываем ошибку в лог
+            with open("app_log.txt", 'a', encoding='utf-8') as log_file:
+                log_file.write(f"[{timestamp}] Ошибка в {func.__name__}: {error_mess}.\n")
+                log_file.write(f"Подробности:\n{full_error}\n" + "-"*30 + "\n")
+
+            #Сообщаем пользователю об ошибке, не закрывая программу
+            print(f"\n[!] Произошла ошибка при выполнении {func.__name__}: {error_mess}")
+            print("[i] Подробности записаны в app_log.txt")
+
+            return
+    return wrapper
+
+
 def init_db():
     # Создаем подключение к файлу базы данных
     conn = sqlite3.connect('accessories.db')
@@ -32,6 +69,7 @@ def init_db():
     conn.commit()
     conn.close()
 
+@action_logger
 def add_to_db(item):
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
@@ -42,6 +80,7 @@ def add_to_db(item):
     conn.close()
     print(f"--- [Успех]: {item.title} ({item.art}) добавлен в базу! ---")
 
+@action_logger
 def show_all_items():
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
@@ -60,6 +99,7 @@ def show_all_items():
 
     conn.close()
 
+@action_logger
 def find_by_art(art):
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
@@ -76,6 +116,7 @@ def find_by_art(art):
 
     conn.close()
 
+@action_logger
 def update_price(art, new_price):
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
@@ -93,6 +134,7 @@ def update_price(art, new_price):
 
     conn.close()
 
+@action_logger
 def delete_item(art):
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
@@ -110,7 +152,9 @@ def delete_item(art):
 
     conn.close()
 
+@action_logger
 def export_to_csv():
+    #raise PermissionError("Искусственная ошибка доступа для теста декоратора!")
     with sqlite3.connect('accessories.db') as conn:
         cursor = conn.cursor()
         #Достаем все данные из таблицы
