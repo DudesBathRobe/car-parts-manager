@@ -196,7 +196,7 @@ if __name__ == "__main__":
         choice = input("Выберите действие: ")
 
         if choice == '1':
-            art = input("\nВведите артикул товара (или 'exit' для выхода): ")
+            art = input("\nВведите артикул товара (или 'exit' для выхода): ").capitalize()
             if art.lower() == 'exit':
                 break
             name = input("Введите название товара: ")
@@ -213,11 +213,11 @@ if __name__ == "__main__":
             show_all_items()
 
         elif choice == '3':
-            search_art = input('Введите артикул: ')
+            search_art = input('Введите артикул: ').capitalize()
             find_by_art(search_art)
 
         elif choice == '4':
-            art = input('Введите артикул: ')
+            art = input('Введите артикул: ').capitalize()
             try:
                 new_price = float(input("Введите новую цену: "))
                 update_price(art, new_price)
@@ -225,9 +225,9 @@ if __name__ == "__main__":
                 print("Ошибка: Цена должна быть числом!")
 
         elif choice == '5':
-            art = input("Введите артикул: ")
+            art = input("Введите артикул: ").capitalize()
             print("")
-            print(f"Вы дейсьвительно хотите удалить артикул {art} из списка товаров? y/n")
+            print(f"Вы действительно хотите удалить артикул {art} из списка товаров? y/n")
             temp_choice = input()
             if temp_choice.lower() == 'y':
                 delete_item(art)
